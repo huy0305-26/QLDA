@@ -21,6 +21,7 @@ class HomeController extends Controller {
         // Lấy dữ liệu
         $products = $productModel->getAllProducts($categoryId);
         $categories = $categoryModel->getAllCategories();
+        $categoriesTree = $categoryModel->getCategoriesTree();
         
         // Lấy tên danh mục nếu đang filter
         $currentCategory = null;
@@ -33,6 +34,7 @@ class HomeController extends Controller {
             'page_title' => $categoryId > 0 && $currentCategory ? $currentCategory['TenDM'] : 'Trang chủ',
             'products' => $products,
             'categories' => $categories,
+            'categoriesTree' => $categoriesTree,
             'currentCategory' => $currentCategory,
             'categoryId' => $categoryId
         ];

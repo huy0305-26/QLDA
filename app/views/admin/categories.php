@@ -13,13 +13,28 @@
         <div class="card-body">
             <form method="POST" action="" class="admin-form">
                 <div class="form-group">
-                    <label for="ten_dm">Tên danh mục</label>
+                    <label for="ten_dm">Tên danh mục <span class="required">*</span></label>
                     <input type="text" 
                            id="ten_dm" 
                            name="ten_dm" 
                            class="form-control" 
                            placeholder="Nhập tên danh mục"
                            required>
+                </div>
+                <div class="form-group">
+                    <label for="ma_dm_cha">Danh mục cha</label>
+                    <select id="ma_dm_cha" name="ma_dm_cha" class="form-control">
+                        <option value="">-- Danh mục gốc (không có cha) --</option>
+                        <?php foreach ($parentCategories as $parent): ?>
+                        <option value="<?php echo $parent['MaDM']; ?>">
+                            <?php echo htmlspecialchars($parent['TenDM']); ?>
+                        </option>
+                        <?php endforeach; ?>
+                    </select>
+                    <small class="form-hint">
+                        <i class="fas fa-info-circle"></i> 
+                        Chọn danh mục cha nếu đây là danh mục con (VD: Áo thun thuộc danh mục Áo)
+                    </small>
                 </div>
                 <button type="submit" name="add_category" class="btn btn-primary btn-block">
                     <i class="fas fa-plus"></i> Thêm danh mục
@@ -40,6 +55,7 @@
                     <tr>
                         <th>Mã DM</th>
                         <th>Tên danh mục</th>
+                        <th>Danh mục cha</th>
                         <th>Thao tác</th>
                     </tr>
                 </thead>
@@ -48,11 +64,33 @@
                     <tr id="cat-<?php echo $category['MaDM']; ?>">
                         <td>#<?php echo $category['MaDM']; ?></td>
                         <td>
-                            <span class="cat-name"><?php echo htmlspecialchars($category['TenDM']); ?></span>
+                            <span class="cat-name">
+                                <?php echo htmlspecialchars($category['TenDM']); ?>
+                            </span>
                             <form method="POST" action="" class="edit-form" style="display:none;">
                                 <input type="hidden" name="ma_dm" value="<?php echo $category['MaDM']; ?>">
-                                <input type="text" name="ten_dm" class="form-control" value="<?php echo htmlspecialchars($category['TenDM']); ?>" required>
+                                <input type="text" name="ten_dm" class="form-control" value="<?php echo htmlspecialchars($category['TenDM']); ?>" required style="margin-bottom: 5px;">
+                                <select name="ma_dm_cha" class="form-control">
+                                    <option value="">-- Danh mục gốc --</option>
+                                    <?php foreach ($parentCategories as $parent): ?>
+                                        <?php if ($parent['MaDM'] != $category['MaDM']): ?>
+                                        <option value="<?php echo $parent['MaDM']; ?>" 
+                                                <?php echo $category['MaDM_Cha'] == $parent['MaDM'] ? 'selected' : ''; ?>>
+                                            <?php echo htmlspecialchars($parent['TenDM']); ?>
+                                        </option>
+                                        <?php endif; ?>
+                                    <?php endforeach; ?>
+                                </select>
                             </form>
+                        </td>
+                        <td>
+                            <span class="cat-parent">
+                                <?php if ($category['TenDMCha']): ?>
+                                    <span class="badge badge-info"><?php echo htmlspecialchars($category['TenDMCha']); ?></span>
+                                <?php else: ?>
+                                    <span style="color: #999;">-</span>
+                                <?php endif; ?>
+                            </span>
                         </td>
                         <td class="actions">
                             <a href="../public/index.php?category=<?php echo $category['MaDM']; ?>" 

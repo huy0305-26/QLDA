@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 24, 2025 at 09:05 AM
+-- Generation Time: Oct 24, 2025 at 04:06 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -114,18 +114,20 @@ CREATE TABLE `chitiet_phieuxuatnhap` (
 
 CREATE TABLE `danhmuc` (
   `MaDM` int(11) NOT NULL,
-  `TenDM` varchar(100) DEFAULT NULL
+  `TenDM` varchar(100) DEFAULT NULL,
+  `MaDM_Cha` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `danhmuc`
 --
 
-INSERT INTO `danhmuc` (`MaDM`, `TenDM`) VALUES
-(1, 'Áo thun'),
-(2, 'Áo sơ mi'),
-(3, 'Quần jean'),
-(4, 'Quần tây');
+INSERT INTO `danhmuc` (`MaDM`, `TenDM`, `MaDM_Cha`) VALUES
+(1, 'Áo thun', 6),
+(2, 'Áo sơ mi', 6),
+(3, 'Quần jean', 5),
+(5, 'Quần', NULL),
+(6, 'Áo', NULL);
 
 -- --------------------------------------------------------
 
@@ -263,7 +265,7 @@ CREATE TABLE `nhanvien` (
 INSERT INTO `nhanvien` (`MaNV`, `HoTen`, `TenDangNhap`, `MatKhau`, `Email`, `SoDienThoai`, `MaVaiTro`, `TrangThai`) VALUES
 (1, 'Admin', 'admin', '123456', 'admin@shop.vn', '0901111222', 1, '1'),
 (2, 'Nguyen Thi Mai', 'mai_nv', '123456', 'mai@shop.vn', '0903333444', 3, '1'),
-(3, 'Le Quoc Hung', 'hung_kho', '123456', 'hung@shop.vn', '0905555666', 2, '1');
+(3, 'Le Quoc Hung', 'hung_kho', '123456', 'hung@shop.vn', '0905555666', 2, 'active');
 
 -- --------------------------------------------------------
 
@@ -335,10 +337,11 @@ CREATE TABLE `sanpham` (
 --
 
 INSERT INTO `sanpham` (`MaSP`, `TenSP`, `MaDM`, `MaTH`, `XuatXu`, `MoTa`, `HinhAnh`) VALUES
-(1, 'Áo thun cổ tròn nam', 1, 3, 'Việt Nam', 'Áo thun cotton 100%, co giãn tốt', 'default-product.jpg'),
+(1, 'Áo thun cổ tròn nam', 1, 3, 'Việt Nam', 'Áo thun cotton 100%, co giãn tốt', '1761310019_do-mixi--1736908520669519357993.png'),
 (2, 'Áo sơ mi trắng tay dài', 2, 1, 'Việt Nam', 'Chất liệu cotton lạnh, kiểu dáng công sở', '1761283724_sanpham3.webp'),
 (3, 'Quần jean xanh nam', 3, 4, 'Trung Quốc', 'Jean slimfit, vải dày, bền màu', '1761283412_sanpham1.jpg'),
-(4, 'Quần test', 1, 2, 'Việt Nam', 'Mô Tả...', '1761283393_sanpham2.jpg');
+(5, 'TEST 123', 1, 1, 'Việt Nam', 'Mô tả....', '1761310012_1727345194543.png'),
+(6, 'Quần test', 2, 1, 'Việt Nam', 'Mô tả....', '1761310006_4KG2VgKFDJWqdtg4UMRqk5CnkJVoCpe5QMd20Pf7.jpg');
 
 -- --------------------------------------------------------
 
@@ -366,8 +369,9 @@ INSERT INTO `sanpham_bienthe` (`MaSP_BienThe`, `MaSP`, `KichThuoc`, `MauSac`, `G
 (1, 1, 'M', 'Trắng', 80000.00, 120000.00, 150000.00, 50, '2025-10-01'),
 (2, 1, 'L', 'Đen', 80000.00, 120000.00, 150000.00, 40, '2025-10-01'),
 (3, 2, 'M', 'Trắng', 150000.00, 220000.00, 275000.00, 25, '2025-10-01'),
-(4, 3, '32', 'Xanh đậm', 180000.00, 270000.00, 337500.00, 20, '2025-10-01'),
-(5, 4, 'M', 'Đen', 120000.00, 150000.00, 187500.00, 1, NULL);
+(4, 3, '32', 'Xanh đậm', 180000.00, 270000.00, 27000000.00, 20, '2025-10-01'),
+(7, 5, 'XL', ' Đen', 100000.00, 250000.00, 416667.00, 20, NULL),
+(8, 6, 'XL', ' Đen', 150000.00, 300000.00, 1500000.00, 10, NULL);
 
 -- --------------------------------------------------------
 
@@ -495,7 +499,8 @@ ALTER TABLE `chitiet_phieuxuatnhap`
 -- Indexes for table `danhmuc`
 --
 ALTER TABLE `danhmuc`
-  ADD PRIMARY KEY (`MaDM`);
+  ADD PRIMARY KEY (`MaDM`),
+  ADD KEY `fk_danhmuc_cha` (`MaDM_Cha`);
 
 --
 -- Indexes for table `hoadon`
@@ -618,7 +623,7 @@ ALTER TABLE `chitiet_phieuxuatnhap`
 -- AUTO_INCREMENT for table `danhmuc`
 --
 ALTER TABLE `danhmuc`
-  MODIFY `MaDM` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `MaDM` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `hoadon`
@@ -666,13 +671,13 @@ ALTER TABLE `phieuxuatnhap`
 -- AUTO_INCREMENT for table `sanpham`
 --
 ALTER TABLE `sanpham`
-  MODIFY `MaSP` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `MaSP` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `sanpham_bienthe`
 --
 ALTER TABLE `sanpham_bienthe`
-  MODIFY `MaSP_BienThe` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `MaSP_BienThe` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `saoluu`
@@ -724,6 +729,12 @@ ALTER TABLE `chitietphieunhap`
 ALTER TABLE `chitiet_phieuxuatnhap`
   ADD CONSTRAINT `fk_ctpxn_bienthe` FOREIGN KEY (`MaSP_BienThe`) REFERENCES `sanpham_bienthe` (`MaSP_BienThe`) ON UPDATE CASCADE,
   ADD CONSTRAINT `fk_ctpxn_phieu` FOREIGN KEY (`MaPhieu`) REFERENCES `phieuxuatnhap` (`MaPhieu`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `danhmuc`
+--
+ALTER TABLE `danhmuc`
+  ADD CONSTRAINT `fk_danhmuc_cha` FOREIGN KEY (`MaDM_Cha`) REFERENCES `danhmuc` (`MaDM`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 --
 -- Constraints for table `hoadon`

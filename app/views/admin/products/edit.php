@@ -137,6 +137,7 @@
                     <th>Size</th>
                     <th>Màu sắc</th>
                     <th>Giá nhập</th>
+                    <th>% Giảm</th>
                     <th>Giá bán</th>
                     <th>Tồn kho</th>
                     <th>Thao tác</th>
@@ -157,6 +158,23 @@
                     <td>
                         <span class="var-text"><?php echo number_format($variant['GiaNhap'], 0, ',', '.'); ?>đ</span>
                         <input type="number" class="form-control var-input" style="display:none;" value="<?php echo $variant['GiaNhap']; ?>">
+                    </td>
+                    <td>
+                        <?php 
+                        // Tính % giảm giá từ GiaGoc và GiaBan
+                        $phanTramGiam = 0;
+                        if ($variant['GiaGoc'] > 0 && $variant['GiaGoc'] > $variant['GiaBan']) {
+                            $phanTramGiam = round((($variant['GiaGoc'] - $variant['GiaBan']) / $variant['GiaGoc']) * 100);
+                        }
+                        ?>
+                        <span class="var-text">
+                            <?php if ($phanTramGiam > 0): ?>
+                                <span style="color: #f04b4c; font-weight: bold;">-<?php echo $phanTramGiam; ?>%</span>
+                            <?php else: ?>
+                                <span style="color: #999;">0%</span>
+                            <?php endif; ?>
+                        </span>
+                        <input type="number" class="form-control var-input" style="display:none;" value="<?php echo $phanTramGiam; ?>" min="0" max="99">
                     </td>
                     <td>
                         <span class="var-text text-success"><strong><?php echo number_format($variant['GiaBan'], 0, ',', '.'); ?>đ</strong></span>
@@ -227,7 +245,25 @@
                 
                 <div class="form-group">
                     <label for="gia_ban">Giá bán <span class="required">*</span></label>
-                    <input type="number" id="gia_ban" name="gia_ban" class="form-control" placeholder="VD: 150000" required>
+                    <input type="number" id="gia_ban" name="gia_ban" class="form-control" placeholder="VD: 150000" required onchange="calculateGiaGoc()">
+                </div>
+                
+                <div class="form-group">
+                    <label for="phan_tram_giam">% Giảm giá</label>
+                    <input type="number" id="phan_tram_giam" name="phan_tram_giam" class="form-control" placeholder="VD: 20" value="0" min="0" max="99" onchange="calculateGiaGoc()">
+                    <small class="form-hint">
+                        <i class="fas fa-info-circle"></i> 
+                        Nhập 0 nếu không có giảm giá
+                    </small>
+                </div>
+                
+                <div class="form-group">
+                    <label>Giá gốc (tự động tính)</label>
+                    <input type="text" id="display_gia_goc" class="form-control" disabled style="background: #f0f0f0; color: #666; font-weight: bold;">
+                    <small class="form-hint">
+                        <i class="fas fa-calculator"></i> 
+                        Được tính tự động từ giá bán và % giảm
+                    </small>
                 </div>
                 
                 <div class="form-group">
@@ -287,9 +323,16 @@ function saveVariant(id) {
         kich_thuoc: inputs[0].value,
         mau_sac: inputs[1].value,
         gia_nhap: inputs[2].value,
-        gia_ban: inputs[3].value,
-        ton_kho: inputs[4].value
+        phan_tram_giam: inputs[3].value,
+        gia_ban: inputs[4].value,
+        ton_kho: inputs[5].value
     };
+    
+    // Validation: Kiểm tra % giảm giá hợp lệ
+    if (data.phan_tram_giam < 0 || data.phan_tram_giam >= 100) {
+        alert('% Giảm giá phải từ 0 đến 99!');
+        return;
+    }
     
     // Create form and submit
     const form = document.createElement('form');
@@ -323,6 +366,32 @@ function showAddVariantForm() {
 function hideAddVariantForm() {
     document.getElementById('add-variant-form').style.display = 'none';
 }
+
+// Tính giá gốc tự động
+function calculateGiaGoc() {
+    const giaBan = parseFloat(document.getElementById('gia_ban').value) || 0;
+    const phanTramGiam = parseFloat(document.getElementById('phan_tram_giam').value) || 0;
+    
+    let giaGoc = 0;
+    if (phanTramGiam > 0 && phanTramGiam < 100 && giaBan > 0) {
+        // Công thức: GiaGoc = GiaBan / (1 - %GiamGia/100)
+        giaGoc = Math.round(giaBan / (1 - phanTramGiam / 100));
+    }
+    
+    const displayField = document.getElementById('display_gia_goc');
+    if (giaGoc > 0) {
+        displayField.value = new Intl.NumberFormat('vi-VN').format(giaGoc) + 'đ';
+        displayField.style.color = '#f04b4c';
+    } else {
+        displayField.value = 'Không giảm giá';
+        displayField.style.color = '#999';
+    }
+}
+
+// Gọi hàm khi trang load để hiển thị giá gốc ban đầu
+document.addEventListener('DOMContentLoaded', function() {
+    calculateGiaGoc();
+});
 
 // Preview ảnh trước khi upload
 document.getElementById('hinh_anh').addEventListener('change', function(e) {

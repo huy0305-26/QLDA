@@ -65,10 +65,6 @@
                             <?php endif; ?>
                         <?php endif; ?>
                     </div>
-                    
-                    <div class="product-stock">
-                        <i class="fas fa-check-circle"></i> Còn hàng
-                    </div>
                 </div>
             </div>
             <?php endforeach; ?>

@@ -99,20 +99,25 @@ class Product extends Model {
     }
     
     /**
-     * Lấy các biến thể của sản phẩm
+     * Lấy các biến thể của sản phẩm (cho admin - bao gồm cả hết hàng)
      * @param int $productId
+     * @param bool $onlyInStock Chỉ lấy biến thể còn hàng (false = tất cả)
      * @return array
      */
-    public function getProductVariants($productId) {
+    public function getProductVariants($productId, $onlyInStock = false) {
         $sql = "SELECT *, 
                 CASE 
                     WHEN GiaGoc > 0 AND GiaGoc > GiaBan THEN ROUND(((GiaGoc - GiaBan) / GiaGoc) * 100, 0)
                     ELSE 0 
                 END as PhanTramGiam
                 FROM sanpham_bienthe 
-                WHERE MaSP = " . intval($productId) . " 
-                AND TonKho > 0 
-                ORDER BY KichThuoc, MauSac";
+                WHERE MaSP = " . intval($productId);
+        
+        if ($onlyInStock) {
+            $sql .= " AND TonKho > 0";
+        }
+        
+        $sql .= " ORDER BY KichThuoc, MauSac";
         
         $result = $this->query($sql);
         

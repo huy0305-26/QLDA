@@ -229,10 +229,18 @@ class AdminController extends Controller {
             $mauSac = $productModel->escape($_POST['mau_sac']);
             $giaNhap = intval($_POST['gia_nhap']);
             $giaBan = intval($_POST['gia_ban']);
+            $phanTramGiam = isset($_POST['phan_tram_giam']) ? intval($_POST['phan_tram_giam']) : 0;
             $tonKho = intval($_POST['ton_kho']);
             
-            $sql = "INSERT INTO sanpham_bienthe (MaSP, KichThuoc, MauSac, GiaNhap, GiaBan, TonKho)
-                    VALUES ({$productId}, '{$kichThuoc}', '{$mauSac}', {$giaNhap}, {$giaBan}, {$tonKho})";
+            // Tính giá gốc từ % giảm giá
+            // Công thức: GiaGoc = GiaBan / (1 - %GiamGia/100)
+            $giaGoc = 0;
+            if ($phanTramGiam > 0 && $phanTramGiam < 100) {
+                $giaGoc = round($giaBan / (1 - $phanTramGiam / 100));
+            }
+            
+            $sql = "INSERT INTO sanpham_bienthe (MaSP, KichThuoc, MauSac, GiaNhap, GiaBan, GiaGoc, TonKho)
+                    VALUES ({$productId}, '{$kichThuoc}', '{$mauSac}', {$giaNhap}, {$giaBan}, {$giaGoc}, {$tonKho})";
             
             if ($productModel->query($sql)) {
                 $this->redirect("index.php?action=editProduct&id={$productId}");
@@ -249,13 +257,22 @@ class AdminController extends Controller {
             $mauSac = $productModel->escape($_POST['mau_sac']);
             $giaNhap = intval($_POST['gia_nhap']);
             $giaBan = intval($_POST['gia_ban']);
+            $phanTramGiam = isset($_POST['phan_tram_giam']) ? intval($_POST['phan_tram_giam']) : 0;
             $tonKho = intval($_POST['ton_kho']);
+            
+            // Tính giá gốc từ % giảm giá
+            // Công thức: GiaGoc = GiaBan / (1 - %GiamGia/100)
+            $giaGoc = 0;
+            if ($phanTramGiam > 0 && $phanTramGiam < 100) {
+                $giaGoc = round($giaBan / (1 - $phanTramGiam / 100));
+            }
             
             $sql = "UPDATE sanpham_bienthe 
                     SET KichThuoc = '{$kichThuoc}',
                         MauSac = '{$mauSac}',
                         GiaNhap = {$giaNhap},
                         GiaBan = {$giaBan},
+                        GiaGoc = {$giaGoc},
                         TonKho = {$tonKho}
                     WHERE MaSP_BienThe = {$variantId}";
             
@@ -368,7 +385,14 @@ class AdminController extends Controller {
         // Xử lý thêm danh mục
         if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_category'])) {
             $tenDM = $categoryModel->escape($_POST['ten_dm']);
-            $sql = "INSERT INTO danhmuc (TenDM) VALUES ('{$tenDM}')";
+            $maDMCha = isset($_POST['ma_dm_cha']) && $_POST['ma_dm_cha'] != '' ? intval($_POST['ma_dm_cha']) : null;
+            
+            if ($maDMCha !== null) {
+                $sql = "INSERT INTO danhmuc (TenDM, MaDM_Cha) VALUES ('{$tenDM}', {$maDMCha})";
+            } else {
+                $sql = "INSERT INTO danhmuc (TenDM, MaDM_Cha) VALUES ('{$tenDM}', NULL)";
+            }
+            
             $categoryModel->query($sql);
             $this->redirect('index.php?action=categories');
             return;
@@ -378,7 +402,14 @@ class AdminController extends Controller {
         if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_category'])) {
             $maDM = intval($_POST['ma_dm']);
             $tenDM = $categoryModel->escape($_POST['ten_dm']);
-            $sql = "UPDATE danhmuc SET TenDM = '{$tenDM}' WHERE MaDM = {$maDM}";
+            $maDMCha = isset($_POST['ma_dm_cha']) && $_POST['ma_dm_cha'] != '' ? intval($_POST['ma_dm_cha']) : null;
+            
+            if ($maDMCha !== null) {
+                $sql = "UPDATE danhmuc SET TenDM = '{$tenDM}', MaDM_Cha = {$maDMCha} WHERE MaDM = {$maDM}";
+            } else {
+                $sql = "UPDATE danhmuc SET TenDM = '{$tenDM}', MaDM_Cha = NULL WHERE MaDM = {$maDM}";
+            }
+            
             $categoryModel->query($sql);
             $this->redirect('index.php?action=categories');
             return;
@@ -394,10 +425,12 @@ class AdminController extends Controller {
         }
         
         $categories = $categoryModel->getAllCategories();
+        $parentCategories = $categoryModel->getParentCategories();
         
         $data = [
             'page_title' => 'Quản lý danh mục',
-            'categories' => $categories
+            'categories' => $categories,
+            'parentCategories' => $parentCategories
         ];
         
         $this->view('admin/categories', $data);

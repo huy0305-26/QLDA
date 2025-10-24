@@ -30,8 +30,8 @@ class ProductController extends Controller {
             return;
         }
         
-        // Lấy các biến thể
-        $variants = $productModel->getProductVariants($productId);
+        // Lấy các biến thể (chỉ lấy biến thể còn hàng)
+        $variants = $productModel->getProductVariants($productId, true);
         
         // Xử lý thêm vào giỏ hàng
         $successMessage = null;
