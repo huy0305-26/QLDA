@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 24, 2025 at 04:06 PM
+-- Generation Time: Oct 24, 2025 at 05:22 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -65,7 +65,12 @@ CREATE TABLE `chitiethoadon` (
 
 INSERT INTO `chitiethoadon` (`MaCTHD`, `MaHD`, `MaSP_BienThe`, `SoLuong`, `DonGia`, `ThanhTien`) VALUES
 (1, 1, 1, 1, 120000.00, 120000.00),
-(2, 2, 4, 1, 270000.00, 270000.00);
+(2, 2, 4, 1, 270000.00, 270000.00),
+(3, 3, 4, 2, 270000.00, 540000.00),
+(4, 3, 3, 1, 2300000.00, 2300000.00),
+(5, 4, 1, 2, 120000.00, 240000.00),
+(6, 4, 2, 2, 120000.00, 240000.00),
+(7, 5, 7, 1, 250000.00, 250000.00);
 
 -- --------------------------------------------------------
 
@@ -127,7 +132,9 @@ INSERT INTO `danhmuc` (`MaDM`, `TenDM`, `MaDM_Cha`) VALUES
 (2, 'Áo sơ mi', 6),
 (3, 'Quần jean', 5),
 (5, 'Quần', NULL),
-(6, 'Áo', NULL);
+(6, 'Áo', NULL),
+(11, 'Quần test', 5),
+(13, 'Phụ Kiện', NULL);
 
 -- --------------------------------------------------------
 
@@ -155,7 +162,10 @@ CREATE TABLE `hoadon` (
 
 INSERT INTO `hoadon` (`MaHD`, `NgayLap`, `TongTien`, `HinhThucThanhToan`, `MaKH`, `TenKH`, `SoDienThoai`, `DiaChi`, `MaNV`, `GhiChu`, `TrangThai`) VALUES
 (1, '2025-10-10', 120000.00, 'Tiền mặt', 1, 'Nguyen Van A', '0901234567', 'Q1, TP.HCM', 2, 'Khách mua trực tiếp', 'Đang xử lý'),
-(2, '2025-10-12', 270000.00, 'Chuyển khoản', 2, 'Tran Thi B', '0907654321', 'Q5, Hà Nội', 2, 'Mua online', 'Đang xử lý');
+(2, '2025-10-12', 270000.00, 'Chuyển khoản', 2, 'Tran Thi B', '0907654321', 'Q5, Hà Nội', 2, 'Mua online', 'Đang xử lý'),
+(3, '2025-10-24', 2840000.00, 'Tiền mặt', NULL, 'Trần Gia Huy', '0393091124', 'Quận Bình Thạnh, Hồ Chí Minh', NULL, 'Ghi chú...', 'Đã xác nhận'),
+(4, '2025-10-24', 480000.00, 'Tiền mặt', 4, 'Trần Gia Huy', '0393091124', 'Bình Thạnh, Hồ Chí Minh', NULL, 'Ghi Chú nè....', 'Đang xử lý'),
+(5, '2025-10-24', 250000.00, 'Tiền mặt', 4, 'Trần Gia Huyy', '0393091124', 'Bình Thạnh', NULL, 'Ghi Chú...', 'Đang xử lý');
 
 -- --------------------------------------------------------
 
@@ -180,7 +190,8 @@ CREATE TABLE `khachhang` (
 INSERT INTO `khachhang` (`MaKH`, `HoTen`, `SoDienThoai`, `Email`, `DiaChi`, `HangThanhVien`, `DiemTichLuy`) VALUES
 (1, 'Nguyen Van A', '0901234567', 'a@gmail.com', 'Q1, TP.HCM', 'Vang', 1200),
 (2, 'Tran Thi BB', '0907654321', 'b@gmail.com', 'Q5, Hà Nội', 'Bac', 800),
-(3, 'Le Van C', '0912345678', 'c@gmail.com', 'Bien Hoa, Dong Nai', 'Thuong', 200);
+(3, 'Le Van C', '0912345678', 'c@gmail.com', 'Bien Hoa, Dong Nai', 'Thuong', 200),
+(4, 'Trần Gia Huyy', '0393091124', '', 'Bình Thạnh', 'Bac', 730);
 
 -- --------------------------------------------------------
 
@@ -341,7 +352,7 @@ INSERT INTO `sanpham` (`MaSP`, `TenSP`, `MaDM`, `MaTH`, `XuatXu`, `MoTa`, `HinhA
 (2, 'Áo sơ mi trắng tay dài', 2, 1, 'Việt Nam', 'Chất liệu cotton lạnh, kiểu dáng công sở', '1761283724_sanpham3.webp'),
 (3, 'Quần jean xanh nam', 3, 4, 'Trung Quốc', 'Jean slimfit, vải dày, bền màu', '1761283412_sanpham1.jpg'),
 (5, 'TEST 123', 1, 1, 'Việt Nam', 'Mô tả....', '1761310012_1727345194543.png'),
-(6, 'Quần test', 2, 1, 'Việt Nam', 'Mô tả....', '1761310006_4KG2VgKFDJWqdtg4UMRqk5CnkJVoCpe5QMd20Pf7.jpg');
+(6, 'Quần test', 2, 5, 'Việt Nam', 'Mô tả....', '1761310006_4KG2VgKFDJWqdtg4UMRqk5CnkJVoCpe5QMd20Pf7.jpg');
 
 -- --------------------------------------------------------
 
@@ -366,12 +377,12 @@ CREATE TABLE `sanpham_bienthe` (
 --
 
 INSERT INTO `sanpham_bienthe` (`MaSP_BienThe`, `MaSP`, `KichThuoc`, `MauSac`, `GiaNhap`, `GiaBan`, `GiaGoc`, `TonKho`, `NgayCapNhat`) VALUES
-(1, 1, 'M', 'Trắng', 80000.00, 120000.00, 150000.00, 50, '2025-10-01'),
-(2, 1, 'L', 'Đen', 80000.00, 120000.00, 150000.00, 40, '2025-10-01'),
-(3, 2, 'M', 'Trắng', 150000.00, 220000.00, 275000.00, 25, '2025-10-01'),
-(4, 3, '32', 'Xanh đậm', 180000.00, 270000.00, 27000000.00, 20, '2025-10-01'),
-(7, 5, 'XL', ' Đen', 100000.00, 250000.00, 416667.00, 20, NULL),
-(8, 6, 'XL', ' Đen', 150000.00, 300000.00, 1500000.00, 10, NULL);
+(1, 1, 'M', 'Trắng', 80000.00, 120000.00, 150000.00, 48, '2025-10-01'),
+(2, 1, 'L', 'Đen', 80000.00, 120000.00, 150000.00, 38, '2025-10-01'),
+(3, 2, 'M', 'Trắng', 150000.00, 2300000.00, 2875000.00, 24, '2025-10-01'),
+(4, 3, '32', 'Xanh đậm', 180000.00, 270000.00, 337500.00, 18, '2025-10-01'),
+(7, 5, 'XL', ' Đen', 100000.00, 250000.00, 416667.00, 19, NULL),
+(8, 6, 'XL', ' Đen', 150000.00, 300000.00, 600000.00, 10, NULL);
 
 -- --------------------------------------------------------
 
@@ -415,7 +426,8 @@ INSERT INTO `thuonghieu` (`MaTH`, `TenTH`) VALUES
 (1, 'Việt Tiến'),
 (2, 'Canifa'),
 (3, 'Routine'),
-(4, 'Yody');
+(4, 'Yody'),
+(5, 'Adidas');
 
 -- --------------------------------------------------------
 
@@ -605,7 +617,7 @@ ALTER TABLE `baocaodoanhso`
 -- AUTO_INCREMENT for table `chitiethoadon`
 --
 ALTER TABLE `chitiethoadon`
-  MODIFY `MaCTHD` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `MaCTHD` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `chitietphieunhap`
@@ -623,19 +635,19 @@ ALTER TABLE `chitiet_phieuxuatnhap`
 -- AUTO_INCREMENT for table `danhmuc`
 --
 ALTER TABLE `danhmuc`
-  MODIFY `MaDM` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `MaDM` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT for table `hoadon`
 --
 ALTER TABLE `hoadon`
-  MODIFY `MaHD` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `MaHD` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `khachhang`
 --
 ALTER TABLE `khachhang`
-  MODIFY `MaKH` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `MaKH` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `khuyenmai`
@@ -689,7 +701,7 @@ ALTER TABLE `saoluu`
 -- AUTO_INCREMENT for table `thuonghieu`
 --
 ALTER TABLE `thuonghieu`
-  MODIFY `MaTH` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `MaTH` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `vaitro`
