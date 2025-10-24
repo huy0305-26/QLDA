@@ -68,8 +68,18 @@ class Cart {
         
         $items = [];
         foreach ($_SESSION['cart'] as $variantId => $quantity) {
-            $variant = $productModel->getVariantById($variantId);
-            if ($variant) {
+            // Lấy thông tin biến thể kèm hình ảnh sản phẩm
+            $sql = "SELECT bt.*, sp.TenSP, sp.HinhAnh, dm.TenDM, th.TenTH
+                    FROM sanpham_bienthe bt
+                    LEFT JOIN sanpham sp ON bt.MaSP = sp.MaSP
+                    LEFT JOIN danhmuc dm ON sp.MaDM = dm.MaDM
+                    LEFT JOIN thuonghieu th ON sp.MaTH = th.MaTH
+                    WHERE bt.MaSP_BienThe = " . intval($variantId);
+            
+            $result = $productModel->query($sql);
+            
+            if ($result && $result->num_rows > 0) {
+                $variant = $result->fetch_assoc();
                 $variant['SoLuongMua'] = $quantity;
                 $variant['ThanhTien'] = $variant['GiaBan'] * $quantity;
                 $items[] = $variant;

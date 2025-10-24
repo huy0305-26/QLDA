@@ -60,14 +60,19 @@
                 
                 <div class="form-group">
                     <label for="ma_th">Thương hiệu <span class="required">*</span></label>
-                    <select id="ma_th" name="ma_th" class="form-control" required>
-                        <option value="">-- Chọn thương hiệu --</option>
-                        <?php foreach ($brands as $brand): ?>
-                        <option value="<?php echo $brand['MaTH']; ?>">
-                            <?php echo htmlspecialchars($brand['TenTH']); ?>
-                        </option>
-                        <?php endforeach; ?>
-                    </select>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <select id="ma_th" name="ma_th" class="form-control" required style="flex: 1;">
+                            <option value="">-- Chọn thương hiệu --</option>
+                            <?php foreach ($brands as $brand): ?>
+                            <option value="<?php echo $brand['MaTH']; ?>">
+                                <?php echo htmlspecialchars($brand['TenTH']); ?>
+                            </option>
+                            <?php endforeach; ?>
+                        </select>
+                        <button type="button" onclick="openBrandModal()" class="btn btn-success" style="white-space: nowrap;" title="Thêm thương hiệu mới">
+                            <i class="fas fa-plus"></i> Thêm mới
+                        </button>
+                    </div>
                 </div>
             </div>
             
@@ -105,6 +110,39 @@
     </div>
 </div>
 
+<!-- Modal thêm thương hiệu -->
+<div id="brandModal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3><i class="fas fa-plus-circle"></i> Thêm thương hiệu mới</h3>
+            <button type="button" class="close-modal" onclick="closeBrandModal()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <form id="brandForm" onsubmit="addBrand(event)">
+                <div class="form-group">
+                    <label for="ten_th">Tên thương hiệu <span class="required">*</span></label>
+                    <input type="text" 
+                           id="ten_th" 
+                           name="ten_th" 
+                           class="form-control" 
+                           placeholder="Ví dụ: Nike, Adidas..."
+                           required>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Lưu thương hiệu
+                    </button>
+                    <button type="button" onclick="closeBrandModal()" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> Hủy
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <div class="admin-card">
     <div class="card-header">
         <h3><i class="fas fa-info-circle"></i> Lưu ý</h3>
@@ -118,7 +156,144 @@
     </div>
 </div>
 
+<style>
+/* Modal styles */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+    animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.modal-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid #e1e8ed;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header h3 {
+    margin: 0;
+    color: #333;
+}
+
+.close-modal {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: #999;
+    cursor: pointer;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.3s;
+}
+
+.close-modal:hover {
+    background-color: #f0f0f0;
+    color: #333;
+}
+
+.modal-body {
+    padding: 1.5rem;
+}
+</style>
+
 <script>
+// Modal functions
+function openBrandModal() {
+    document.getElementById('brandModal').style.display = 'flex';
+    document.getElementById('ten_th').focus();
+}
+
+function closeBrandModal() {
+    document.getElementById('brandModal').style.display = 'none';
+    document.getElementById('brandForm').reset();
+}
+
+// Close modal khi click bên ngoài
+document.addEventListener('click', function(e) {
+    const modal = document.getElementById('brandModal');
+    if (e.target === modal) {
+        closeBrandModal();
+    }
+});
+
+// Thêm thương hiệu
+function addBrand(event) {
+    event.preventDefault();
+    
+    const tenTH = document.getElementById('ten_th').value.trim();
+    
+    if (!tenTH) {
+        alert('Vui lòng nhập tên thương hiệu!');
+        return;
+    }
+    
+    // Tạo form data
+    const formData = new FormData();
+    formData.append('add_brand', '1');
+    formData.append('ten_th', tenTH);
+    
+    // Gửi request
+    fetch('index.php?action=addProduct', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Thêm option mới vào select
+            const select = document.getElementById('ma_th');
+            const option = new Option(tenTH, data.brand_id, true, true);
+            select.add(option);
+            
+            // Đóng modal và reset form
+            closeBrandModal();
+            
+            // Thông báo thành công
+            alert('Đã thêm thương hiệu "' + tenTH + '" thành công!');
+        } else {
+            alert('Lỗi: ' + (data.message || 'Không thể thêm thương hiệu'));
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Có lỗi xảy ra khi thêm thương hiệu!');
+    });
+}
+
 // Preview ảnh trước khi upload
 document.getElementById('hinh_anh').addEventListener('change', function(e) {
     const file = e.target.files[0];

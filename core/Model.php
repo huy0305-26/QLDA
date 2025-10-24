@@ -78,6 +78,22 @@ class Model {
     }
     
     /**
+     * Lấy database connection
+     * @return mysqli
+     */
+    public function getConnection() {
+        return $this->db;
+    }
+    
+    /**
+     * Lấy ID của record vừa insert
+     * @return int
+     */
+    public function getLastInsertId() {
+        return $this->db->insert_id;
+    }
+    
+    /**
      * Đóng kết nối database
      */
     public function __destruct() {

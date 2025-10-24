@@ -132,12 +132,43 @@ class AdminController extends Controller {
         
         // Lấy danh sách thương hiệu
         $productModel = $this->model('Product');
-        $brands = $productModel->query("SELECT * FROM thuonghieu")->fetch_all(MYSQLI_ASSOC);
+        $brands = $productModel->query("SELECT * FROM thuonghieu ORDER BY TenTH ASC")->fetch_all(MYSQLI_ASSOC);
         
         $message = null;
         
+        // Xử lý thêm thương hiệu qua AJAX
+        if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_brand'])) {
+            header('Content-Type: application/json');
+            
+            $tenTH = isset($_POST['ten_th']) ? $productModel->escape(trim($_POST['ten_th'])) : '';
+            
+            if (empty($tenTH)) {
+                echo json_encode(['success' => false, 'message' => 'Tên thương hiệu không được để trống']);
+                exit();
+            }
+            
+            // Kiểm tra trùng tên
+            $checkSql = "SELECT MaTH FROM thuonghieu WHERE TenTH = '{$tenTH}'";
+            $checkResult = $productModel->query($checkSql);
+            
+            if ($checkResult->num_rows > 0) {
+                echo json_encode(['success' => false, 'message' => 'Thương hiệu đã tồn tại']);
+                exit();
+            }
+            
+            // Thêm thương hiệu mới
+            $sql = "INSERT INTO thuonghieu (TenTH) VALUES ('{$tenTH}')";
+            if ($productModel->query($sql)) {
+                $brandId = $productModel->getLastInsertId();
+                echo json_encode(['success' => true, 'brand_id' => $brandId, 'brand_name' => $_POST['ten_th']]);
+            } else {
+                echo json_encode(['success' => false, 'message' => 'Lỗi khi thêm vào database']);
+            }
+            exit();
+        }
+        
         // Xử lý thêm sản phẩm
-        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+        if ($_SERVER['REQUEST_METHOD'] == 'POST' && !isset($_POST['add_brand'])) {
             $tenSP = $_POST['ten_sp'] ?? '';
             $maDM = intval($_POST['ma_dm']);
             $maTH = intval($_POST['ma_th']);

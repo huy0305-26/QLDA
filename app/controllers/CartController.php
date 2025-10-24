@@ -17,6 +17,12 @@ class CartController extends Controller {
         // Xử lý các actions
         $message = $this->handleActions($cartModel);
         
+        // Lấy thông báo từ session (nếu có)
+        if (isset($_SESSION['cart_message'])) {
+            $message = $_SESSION['cart_message'];
+            unset($_SESSION['cart_message']);
+        }
+        
         // Lấy items trong giỏ hàng
         $cartItems = $cartModel->getItems();
         $total = $cartModel->getTotal();
@@ -33,7 +39,7 @@ class CartController extends Controller {
     }
     
     /**
-     * Xử lý các actions (update, remove, clear)
+     * Xử lý các actions (update)
      * @param Cart $cartModel
      * @return string|null
      */
@@ -48,22 +54,37 @@ class CartController extends Controller {
             }
         }
         
-        // Xóa sản phẩm
-        if (isset($_GET['action']) && $_GET['action'] == 'remove' && isset($_GET['id'])) {
-            $variantId = intval($_GET['id']);
-            $cartModel->remove($variantId);
-            $this->redirect('index.php?controller=cart');
-            return null;
-        }
-        
-        // Xóa toàn bộ giỏ hàng
-        if (isset($_GET['action']) && $_GET['action'] == 'clear') {
-            $cartModel->clear();
-            $this->redirect('index.php?controller=cart');
-            return null;
-        }
-        
         return null;
+    }
+    
+    /**
+     * Xóa sản phẩm khỏi giỏ hàng
+     */
+    public function remove() {
+        require_once __DIR__ . '/../models/Cart.php';
+        $cartModel = new Cart();
+        
+        $variantId = isset($_GET['id']) ? intval($_GET['id']) : 0;
+        
+        if ($variantId > 0) {
+            $cartModel->remove($variantId);
+            $_SESSION['cart_message'] = 'Đã xóa sản phẩm khỏi giỏ hàng!';
+        }
+        
+        $this->redirect('index.php?controller=cart');
+    }
+    
+    /**
+     * Xóa toàn bộ giỏ hàng
+     */
+    public function clear() {
+        require_once __DIR__ . '/../models/Cart.php';
+        $cartModel = new Cart();
+        
+        $cartModel->clear();
+        $_SESSION['cart_message'] = 'Đã xóa toàn bộ giỏ hàng!';
+        
+        $this->redirect('index.php?controller=cart');
     }
     
     /**
@@ -84,6 +105,35 @@ class CartController extends Controller {
                 echo json_encode([
                     'success' => true,
                     'message' => 'Đã thêm vào giỏ hàng',
+                    'cart_count' => $cartModel->count()
+                ]);
+                exit();
+            }
+        }
+        
+        header('Content-Type: application/json');
+        echo json_encode(['success' => false, 'message' => 'Có lỗi xảy ra']);
+        exit();
+    }
+    
+    /**
+     * Cập nhật số lượng sản phẩm (Ajax)
+     */
+    public function updateQuantity() {
+        if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_quantity'])) {
+            $variantId = isset($_POST['variant_id']) ? intval($_POST['variant_id']) : 0;
+            $quantity = isset($_POST['quantity']) ? intval($_POST['quantity']) : 1;
+            
+            if ($variantId > 0 && $quantity > 0) {
+                require_once __DIR__ . '/../models/Cart.php';
+                $cartModel = new Cart();
+                $cartModel->update($variantId, $quantity);
+                
+                // Trả về JSON response
+                header('Content-Type: application/json');
+                echo json_encode([
+                    'success' => true,
+                    'message' => 'Đã cập nhật số lượng',
                     'cart_count' => $cartModel->count()
                 ]);
                 exit();
