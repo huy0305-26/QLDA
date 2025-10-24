@@ -1,0 +1,15 @@
+# Cấu hình cho thư mục admin
+RewriteEngine On
+
+# Nếu file hoặc thư mục thật sự tồn tại, không rewrite
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# Rewrite tất cả requests về index.php
+# Ví dụ: admin/login -> admin/index.php?action=login
+RewriteRule ^(.*)$ index.php?action=$1 [QSA,L]
+
+
+
+
+

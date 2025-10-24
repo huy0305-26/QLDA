@@ -1,0 +1,14 @@
+# Enable URL Rewriting (Optional - for clean URLs)
+# Uncomment these lines if you want clean URLs without query strings
+
+# RewriteEngine On
+# RewriteCond %{REQUEST_FILENAME} !-f
+# RewriteCond %{REQUEST_FILENAME} !-d
+# RewriteRule ^(.*)$ index.php?url=$1 [QSA,L]
+
+# For now, we're using query string routing
+# Example: index.php?controller=product&action=detail&id=1
+
+
+
+
