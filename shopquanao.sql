@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 24, 2025 at 06:37 AM
+-- Generation Time: Oct 24, 2025 at 09:05 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -261,9 +261,9 @@ CREATE TABLE `nhanvien` (
 --
 
 INSERT INTO `nhanvien` (`MaNV`, `HoTen`, `TenDangNhap`, `MatKhau`, `Email`, `SoDienThoai`, `MaVaiTro`, `TrangThai`) VALUES
-(1, 'Admin', 'admin', '123456', 'admin@shop.vn', '0901111222', 1, 'active'),
-(2, 'Nguyen Thi Mai', 'mai_nv', '123456', 'mai@shop.vn', '0903333444', 3, 'active'),
-(3, 'Le Quoc Hung', 'hung_kho', '123456', 'hung@shop.vn', '0905555666', 2, 'active');
+(1, 'Admin', 'admin', '123456', 'admin@shop.vn', '0901111222', 1, '1'),
+(2, 'Nguyen Thi Mai', 'mai_nv', '123456', 'mai@shop.vn', '0903333444', 3, '1'),
+(3, 'Le Quoc Hung', 'hung_kho', '123456', 'hung@shop.vn', '0905555666', 2, '1');
 
 -- --------------------------------------------------------
 
@@ -326,17 +326,19 @@ CREATE TABLE `sanpham` (
   `MaDM` int(11) DEFAULT NULL,
   `MaTH` int(11) DEFAULT NULL,
   `XuatXu` varchar(100) DEFAULT NULL,
-  `MoTa` text DEFAULT NULL
+  `MoTa` text DEFAULT NULL,
+  `HinhAnh` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `sanpham`
 --
 
-INSERT INTO `sanpham` (`MaSP`, `TenSP`, `MaDM`, `MaTH`, `XuatXu`, `MoTa`) VALUES
-(1, 'Áo thun cổ tròn nam', 1, 3, 'Việt Nam', 'Áo thun cotton 100%, co giãn tốt'),
-(2, 'Áo sơ mi trắng tay dài', 2, 1, 'Việt Nam', 'Chất liệu cotton lạnh, kiểu dáng công sở'),
-(3, 'Quần jean xanh nam', 3, 4, 'Trung Quốc', 'Jean slimfit, vải dày, bền màu');
+INSERT INTO `sanpham` (`MaSP`, `TenSP`, `MaDM`, `MaTH`, `XuatXu`, `MoTa`, `HinhAnh`) VALUES
+(1, 'Áo thun cổ tròn nam', 1, 3, 'Việt Nam', 'Áo thun cotton 100%, co giãn tốt', 'default-product.jpg'),
+(2, 'Áo sơ mi trắng tay dài', 2, 1, 'Việt Nam', 'Chất liệu cotton lạnh, kiểu dáng công sở', '1761283724_sanpham3.webp'),
+(3, 'Quần jean xanh nam', 3, 4, 'Trung Quốc', 'Jean slimfit, vải dày, bền màu', '1761283412_sanpham1.jpg'),
+(4, 'Quần test', 1, 2, 'Việt Nam', 'Mô Tả...', '1761283393_sanpham2.jpg');
 
 -- --------------------------------------------------------
 
@@ -351,6 +353,7 @@ CREATE TABLE `sanpham_bienthe` (
   `MauSac` varchar(50) DEFAULT NULL,
   `GiaNhap` decimal(10,2) DEFAULT NULL,
   `GiaBan` decimal(10,2) DEFAULT NULL,
+  `GiaGoc` decimal(10,2) DEFAULT NULL,
   `TonKho` int(11) DEFAULT NULL,
   `NgayCapNhat` date DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -359,11 +362,12 @@ CREATE TABLE `sanpham_bienthe` (
 -- Dumping data for table `sanpham_bienthe`
 --
 
-INSERT INTO `sanpham_bienthe` (`MaSP_BienThe`, `MaSP`, `KichThuoc`, `MauSac`, `GiaNhap`, `GiaBan`, `TonKho`, `NgayCapNhat`) VALUES
-(1, 1, 'M', 'Trắng', 80000.00, 120000.00, 50, '2025-10-01'),
-(2, 1, 'L', 'Đen', 80000.00, 120000.00, 40, '2025-10-01'),
-(3, 2, 'M', 'Trắng', 150000.00, 220000.00, 25, '2025-10-01'),
-(4, 3, '32', 'Xanh đậm', 180000.00, 270000.00, 30, '2025-10-01');
+INSERT INTO `sanpham_bienthe` (`MaSP_BienThe`, `MaSP`, `KichThuoc`, `MauSac`, `GiaNhap`, `GiaBan`, `GiaGoc`, `TonKho`, `NgayCapNhat`) VALUES
+(1, 1, 'M', 'Trắng', 80000.00, 120000.00, 150000.00, 50, '2025-10-01'),
+(2, 1, 'L', 'Đen', 80000.00, 120000.00, 150000.00, 40, '2025-10-01'),
+(3, 2, 'M', 'Trắng', 150000.00, 220000.00, 275000.00, 25, '2025-10-01'),
+(4, 3, '32', 'Xanh đậm', 180000.00, 270000.00, 337500.00, 20, '2025-10-01'),
+(5, 4, 'M', 'Đen', 120000.00, 150000.00, 187500.00, 1, NULL);
 
 -- --------------------------------------------------------
 
@@ -662,13 +666,13 @@ ALTER TABLE `phieuxuatnhap`
 -- AUTO_INCREMENT for table `sanpham`
 --
 ALTER TABLE `sanpham`
-  MODIFY `MaSP` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `MaSP` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `sanpham_bienthe`
 --
 ALTER TABLE `sanpham_bienthe`
-  MODIFY `MaSP_BienThe` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `MaSP_BienThe` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `saoluu`
