@@ -29,7 +29,8 @@ class Product extends Model {
                 LEFT JOIN sanpham_bienthe bt ON sp.MaSP = bt.MaSP";
         
         if ($categoryId > 0) {
-            $sql .= " WHERE sp.MaDM = " . intval($categoryId);
+            // Lọc theo danh mục hiện tại HOẶC danh mục có danh mục cha là categoryId
+            $sql .= " WHERE (sp.MaDM = " . intval($categoryId) . " OR dm.MaDM_Cha = " . intval($categoryId) . ")";
         }
         
         $sql .= " GROUP BY sp.MaSP
@@ -64,7 +65,8 @@ class Product extends Model {
                 LEFT JOIN sanpham_bienthe bt ON sp.MaSP = bt.MaSP";
         
         if ($categoryId > 0) {
-            $sql .= " WHERE sp.MaDM = " . intval($categoryId);
+            // Lọc theo danh mục hiện tại HOẶC danh mục có danh mục cha là categoryId
+            $sql .= " WHERE (sp.MaDM = " . intval($categoryId) . " OR dm.MaDM_Cha = " . intval($categoryId) . ")";
         }
         
         $sql .= " GROUP BY sp.MaSP

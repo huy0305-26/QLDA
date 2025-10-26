@@ -94,6 +94,27 @@ class Model {
     }
     
     /**
+     * Lấy mã tiếp theo dựa trên mã lớn nhất hiện có
+     * @param string $table Tên bảng
+     * @param string $column Tên cột mã (VD: MaDM, MaSP, MaKH, ...)
+     * @return int Mã tiếp theo
+     */
+    public function getNextId($table, $column) {
+        $sql = "SELECT MAX({$column}) as max_id FROM {$table}";
+        $result = $this->db->query($sql);
+        
+        if ($result && $result->num_rows > 0) {
+            $row = $result->fetch_assoc();
+            $maxId = $row['max_id'];
+            
+            // Nếu chưa có bản ghi nào, trả về 1
+            return ($maxId === null) ? 1 : ($maxId + 1);
+        }
+        
+        return 1;
+    }
+    
+    /**
      * Đóng kết nối database
      */
     public function __destruct() {

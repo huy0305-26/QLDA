@@ -19,11 +19,14 @@ class Order extends Model {
         $tongTien = floatval($orderData['tong_tien']);
         $ngayLap = date('Y-m-d');
         
-        $sql = "INSERT INTO hoadon (NgayLap, TongTien, HinhThucThanhToan, TenKH, SoDienThoai, DiaChi, GhiChu, TrangThai)
-                VALUES ('{$ngayLap}', {$tongTien}, '{$hinhThucThanhToan}', '{$tenKH}', '{$soDienThoai}', '{$diaChi}', '{$ghiChu}', 'Đang xử lý')";
+        // Lấy mã hóa đơn tiếp theo
+        $maHD = $this->getNextId('hoadon', 'MaHD');
+        
+        $sql = "INSERT INTO hoadon (MaHD, NgayLap, TongTien, HinhThucThanhToan, TenKH, SoDienThoai, DiaChi, GhiChu, TrangThai)
+                VALUES ({$maHD}, '{$ngayLap}', {$tongTien}, '{$hinhThucThanhToan}', '{$tenKH}', '{$soDienThoai}', '{$diaChi}', '{$ghiChu}', 'Đang xử lý')";
         
         if ($this->db->query($sql)) {
-            return $this->db->insert_id;
+            return $maHD;
         }
         
         return false;
@@ -41,8 +44,11 @@ class Order extends Model {
             $donGia = floatval($item['GiaBan']);
             $thanhTien = floatval($item['ThanhTien']);
             
-            $sql = "INSERT INTO chitiethoadon (MaHD, MaSP_BienThe, SoLuong, DonGia, ThanhTien)
-                    VALUES ({$orderId}, {$maSPBienThe}, {$soLuong}, {$donGia}, {$thanhTien})";
+            // Lấy mã chi tiết hóa đơn tiếp theo
+            $maCTHD = $this->getNextId('chitiethoadon', 'MaCTHD');
+            
+            $sql = "INSERT INTO chitiethoadon (MaCTHD, MaHD, MaSP_BienThe, SoLuong, DonGia, ThanhTien)
+                    VALUES ({$maCTHD}, {$orderId}, {$maSPBienThe}, {$soLuong}, {$donGia}, {$thanhTien})";
             
             if (!$this->db->query($sql)) {
                 $success = false;

@@ -33,11 +33,14 @@ class Customer extends Model {
         $hangThanhVien = 'Thuong'; // Mặc định là hạng Thường
         $diemTichLuy = 0;
         
-        $sql = "INSERT INTO khachhang (HoTen, SoDienThoai, Email, DiaChi, HangThanhVien, DiemTichLuy)
-                VALUES ('{$hoTen}', '{$soDienThoai}', '{$email}', '{$diaChi}', '{$hangThanhVien}', {$diemTichLuy})";
+        // Lấy mã khách hàng tiếp theo
+        $maKH = $this->getNextId('khachhang', 'MaKH');
+        
+        $sql = "INSERT INTO khachhang (MaKH, HoTen, SoDienThoai, Email, DiaChi, HangThanhVien, DiemTichLuy)
+                VALUES ({$maKH}, '{$hoTen}', '{$soDienThoai}', '{$email}', '{$diaChi}', '{$hangThanhVien}', {$diemTichLuy})";
         
         if ($this->db->query($sql)) {
-            return $this->db->insert_id;
+            return $maKH;
         }
         
         return false;

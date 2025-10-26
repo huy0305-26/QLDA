@@ -1,0 +1,6 @@
+# Ignore uploaded product images
+public/uploads/products/*
+
+# Keep the directory structure but not the files
+!public/uploads/products/.gitkeep
+

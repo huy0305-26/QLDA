@@ -156,11 +156,13 @@ class AdminController extends Controller {
                 exit();
             }
             
+            // Lấy mã thương hiệu tiếp theo
+            $maTH = $productModel->getNextId('thuonghieu', 'MaTH');
+            
             // Thêm thương hiệu mới
-            $sql = "INSERT INTO thuonghieu (TenTH) VALUES ('{$tenTH}')";
+            $sql = "INSERT INTO thuonghieu (MaTH, TenTH) VALUES ({$maTH}, '{$tenTH}')";
             if ($productModel->query($sql)) {
-                $brandId = $productModel->getLastInsertId();
-                echo json_encode(['success' => true, 'brand_id' => $brandId, 'brand_name' => $_POST['ten_th']]);
+                echo json_encode(['success' => true, 'brand_id' => $maTH, 'brand_name' => $_POST['ten_th']]);
             } else {
                 echo json_encode(['success' => false, 'message' => 'Lỗi khi thêm vào database']);
             }
@@ -196,8 +198,11 @@ class AdminController extends Controller {
                     }
                 }
                 
-                $sql = "INSERT INTO sanpham (TenSP, MaDM, MaTH, XuatXu, MoTa, HinhAnh) 
-                        VALUES ('{$tenSP}', {$maDM}, {$maTH}, '{$xuatXu}', '{$moTa}', '{$hinhAnh}')";
+                // Lấy mã sản phẩm tiếp theo
+                $maSP = $productModel->getNextId('sanpham', 'MaSP');
+                
+                $sql = "INSERT INTO sanpham (MaSP, TenSP, MaDM, MaTH, XuatXu, MoTa, HinhAnh) 
+                        VALUES ({$maSP}, '{$tenSP}', {$maDM}, {$maTH}, '{$xuatXu}', '{$moTa}', '{$hinhAnh}')";
                 
                 if ($productModel->query($sql)) {
                     $this->redirect('index.php?action=products');
@@ -270,8 +275,11 @@ class AdminController extends Controller {
                 $giaGoc = round($giaBan / (1 - $phanTramGiam / 100));
             }
             
-            $sql = "INSERT INTO sanpham_bienthe (MaSP, KichThuoc, MauSac, GiaNhap, GiaBan, GiaGoc, TonKho)
-                    VALUES ({$productId}, '{$kichThuoc}', '{$mauSac}', {$giaNhap}, {$giaBan}, {$giaGoc}, {$tonKho})";
+            // Lấy mã biến thể tiếp theo
+            $maSPBienThe = $productModel->getNextId('sanpham_bienthe', 'MaSP_BienThe');
+            
+            $sql = "INSERT INTO sanpham_bienthe (MaSP_BienThe, MaSP, KichThuoc, MauSac, GiaNhap, GiaBan, GiaGoc, TonKho)
+                    VALUES ({$maSPBienThe}, {$productId}, '{$kichThuoc}', '{$mauSac}', {$giaNhap}, {$giaBan}, {$giaGoc}, {$tonKho})";
             
             if ($productModel->query($sql)) {
                 $this->redirect("index.php?action=editProduct&id={$productId}");
@@ -418,10 +426,13 @@ class AdminController extends Controller {
             $tenDM = $categoryModel->escape($_POST['ten_dm']);
             $maDMCha = isset($_POST['ma_dm_cha']) && $_POST['ma_dm_cha'] != '' ? intval($_POST['ma_dm_cha']) : null;
             
+            // Lấy mã danh mục tiếp theo
+            $maDM = $categoryModel->getNextId('danhmuc', 'MaDM');
+            
             if ($maDMCha !== null) {
-                $sql = "INSERT INTO danhmuc (TenDM, MaDM_Cha) VALUES ('{$tenDM}', {$maDMCha})";
+                $sql = "INSERT INTO danhmuc (MaDM, TenDM, MaDM_Cha) VALUES ({$maDM}, '{$tenDM}', {$maDMCha})";
             } else {
-                $sql = "INSERT INTO danhmuc (TenDM, MaDM_Cha) VALUES ('{$tenDM}', NULL)";
+                $sql = "INSERT INTO danhmuc (MaDM, TenDM, MaDM_Cha) VALUES ({$maDM}, '{$tenDM}', NULL)";
             }
             
             $categoryModel->query($sql);
