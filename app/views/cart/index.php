@@ -29,7 +29,12 @@
                         <td>
                             <div class="cart-product">
                                 <?php if (!empty($item['HinhAnh'])): ?>
-                                    <img src="uploads/products/<?php echo htmlspecialchars($item['HinhAnh']); ?>" 
+                                    <?php 
+                                    $imageSrc = (preg_match('/^https?:\\/\\//', $item['HinhAnh'])) 
+                                        ? $item['HinhAnh'] 
+                                        : 'uploads/products/' . $item['HinhAnh'];
+                                    ?>
+                                    <img src="<?php echo htmlspecialchars($imageSrc); ?>" 
                                          alt="<?php echo htmlspecialchars($item['TenSP']); ?>"
                                          class="cart-product-image">
                                 <?php else: ?>

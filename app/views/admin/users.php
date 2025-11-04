@@ -182,11 +182,14 @@
 
 <style>
 .role-badge {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     padding: 0.4rem 0.8rem;
     border-radius: 20px;
     font-weight: bold;
     font-size: 0.85rem;
+    min-height: 32px;
 }
 
 .role-ToanQuyen {
@@ -202,54 +205,6 @@
 .role-XemBanHang {
     background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
     color: white;
-}
-
-.role-select {
-    padding: 0.5rem;
-    border: 2px solid #e1e8ed;
-    border-radius: 8px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: all 0.3s;
-}
-
-.role-select:hover:not(:disabled) {
-    border-color: #3498db;
-    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
-}
-
-.role-select:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
-.status-badge {
-    display: inline-block;
-    padding: 0.4rem 0.8rem;
-    border-radius: 20px;
-    font-size: 0.85rem;
-    font-weight: bold;
-}
-
-.status-active {
-    background: #d4edda;
-    color: #155724;
-}
-
-.status-inactive {
-    background: #f8d7da;
-    color: #721c24;
-}
-
-.status-toggle {
-    background: none;
-    border: none;
-    cursor: pointer;
-    transition: transform 0.2s;
-}
-
-.status-toggle:hover {
-    transform: scale(1.05);
 }
 
 .inactive-user {
@@ -272,6 +227,7 @@
     padding: 1rem;
     text-align: center;
     border: 1px solid #e1e8ed;
+    vertical-align: middle;
 }
 
 .permission-table th {
@@ -296,7 +252,7 @@
     background: #ffe69c !important;
 }
 
-.badge {
+.card-header .badge {
     background: #3498db;
     color: white;
     padding: 0.3rem 0.8rem;

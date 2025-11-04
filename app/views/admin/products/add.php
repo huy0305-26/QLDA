@@ -37,9 +37,15 @@
                            name="hinh_anh" 
                            class="form-control"
                            accept="image/jpeg,image/jpg,image/png,image/gif,image/webp">
+                    <div style="margin:8px 0;text-align:center;">— hoặc —</div>
+                    <input type="url" 
+                           id="hinh_anh_url" 
+                           name="hinh_anh_url" 
+                           class="form-control" 
+                           placeholder="Dán URL ảnh (https://...)">
                     <small class="form-hint">
                         <i class="fas fa-info-circle"></i> 
-                        Chấp nhận: JPG, PNG, GIF, WEBP. Kích thước tối đa: 5MB
+                        Tải file hoặc dùng URL (Cloud). Chấp nhận: JPG, PNG, GIF, WEBP. Tối đa 5MB khi tải file
                     </small>
                     <div id="preview-image" style="margin-top: 10px;"></div>
                 </div>
@@ -322,6 +328,24 @@ document.getElementById('hinh_anh').addEventListener('change', function(e) {
         };
         reader.readAsDataURL(file);
     } else {
+        preview.innerHTML = '';
+    }
+});
+
+// Preview từ URL ảnh cloud
+document.getElementById('hinh_anh_url').addEventListener('input', function(e) {
+    const url = e.target.value.trim();
+    const preview = document.getElementById('preview-image');
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+        preview.innerHTML = `
+            <div style="border: 2px solid #ddd; padding: 10px; border-radius: 8px; display: inline-block;">
+                <img src="${url}" style="max-width: 300px; max-height: 300px; display: block;">
+                <p style="margin: 5px 0 0 0; text-align: center; font-size: 12px; color: #666;">
+                    <i class=\"fas fa-link\"></i> URL ảnh đã nhập
+                </p>
+            </div>
+        `;
+    } else if (url === '') {
         preview.innerHTML = '';
     }
 });

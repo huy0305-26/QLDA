@@ -41,7 +41,12 @@
                     <label for="hinh_anh">Hình ảnh sản phẩm</label>
                     <?php if (!empty($product['HinhAnh'])): ?>
                     <div style="margin-bottom: 10px;">
-                        <img src="../public/uploads/products/<?php echo htmlspecialchars($product['HinhAnh']); ?>" 
+                        <?php 
+                        $imageSrc = (preg_match('/^https?:\\/\\//', $product['HinhAnh'])) 
+                            ? $product['HinhAnh'] 
+                            : '../public/uploads/products/' . $product['HinhAnh'];
+                        ?>
+                        <img src="<?php echo htmlspecialchars($imageSrc); ?>" 
                              style="max-width: 200px; max-height: 200px; border: 2px solid #ddd; padding: 5px; border-radius: 8px;">
                         <p style="margin: 5px 0; font-size: 12px; color: #666;">
                             <i class="fas fa-image"></i> Ảnh hiện tại
@@ -53,9 +58,15 @@
                            name="hinh_anh" 
                            class="form-control"
                            accept="image/jpeg,image/jpg,image/png,image/gif,image/webp">
+                    <div style="margin:8px 0;text-align:center;">— hoặc —</div>
+                    <input type="url" 
+                           id="hinh_anh_url" 
+                           name="hinh_anh_url" 
+                           class="form-control" 
+                           placeholder="Dán URL ảnh (https://...)" value="">
                     <small class="form-hint">
                         <i class="fas fa-info-circle"></i> 
-                        Chọn ảnh mới để thay thế (JPG, PNG, GIF, WEBP - Max 5MB)
+                        Chọn ảnh để tải lên hoặc nhập URL ảnh (Cloud)
                     </small>
                     <div id="preview-image" style="margin-top: 10px;"></div>
                 </div>

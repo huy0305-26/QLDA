@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo isset($page_title) ? $page_title . ' - ' : ''; ?>Admin Panel</title>
+    <title><?php echo isset($page_title) ? $page_title . ' - ' : ''; ?>DTH Admin</title>
     <link rel="stylesheet" href="../public/css/admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
@@ -18,7 +18,7 @@
     <aside class="admin-sidebar">
         <div class="sidebar-header">
             <i class="fas fa-tshirt"></i>
-            <h2>Admin Panel</h2>
+            <h2>DTH Admin</h2>
         </div>
         
         <nav class="sidebar-nav">
@@ -71,7 +71,7 @@
         <!-- Top Bar -->
         <header class="admin-topbar">
             <div class="topbar-left">
-                <h1><?php echo $page_title ?? 'Admin Panel'; ?></h1>
+                <h1><?php echo $page_title ?? 'DTH Admin'; ?></h1>
             </div>
             <div class="topbar-right">
                 <div class="admin-info">

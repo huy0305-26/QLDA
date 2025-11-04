@@ -18,7 +18,12 @@
         <div class="product-detail-left">
             <div class="product-detail-image">
                 <?php if (!empty($product['HinhAnh'])): ?>
-                    <img src="uploads/products/<?php echo htmlspecialchars($product['HinhAnh']); ?>" 
+                    <?php 
+                    $imageSrc = (preg_match('/^https?:\\/\\//', $product['HinhAnh'])) 
+                        ? $product['HinhAnh'] 
+                        : 'uploads/products/' . $product['HinhAnh'];
+                    ?>
+                    <img src="<?php echo htmlspecialchars($imageSrc); ?>" 
                          alt="<?php echo htmlspecialchars($product['TenSP']); ?>">
                 <?php else: ?>
                     <div class="no-image">

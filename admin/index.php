@@ -24,11 +24,3 @@ if (method_exists($controller, $action)) {
     die("Action không tồn tại: $action");
 }
 ?>
-
-
-
-
-
-
-
-

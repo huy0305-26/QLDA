@@ -13,33 +13,40 @@
         <table class="data-table">
             <thead>
                 <tr>
-                    <th>Mã SP</th>
-                    <th>Hình ảnh</th>
+                    <th class="text-center">Mã SP</th>
+                    <th class="text-center">Hình ảnh</th>
                     <th>Tên sản phẩm</th>
                     <th>Danh mục</th>
                     <th>Thương hiệu</th>
                     <th>Giá</th>
-                    <th>Tồn kho</th>
-                    <th>Thao tác</th>
+                    <th class="text-center">Tồn kho</th>
+                    <th class="text-center">Thao tác</th>
                 </tr>
             </thead>
             <tbody>
                 <?php foreach ($products as $product): ?>
                 <tr>
-                    <td>#<?php echo $product['MaSP']; ?></td>
+                    <td class="text-center"><strong>#<?php echo $product['MaSP']; ?></strong></td>
                     <td>
                         <?php if (!empty($product['HinhAnh'])): ?>
-                            <img src="../public/uploads/products/<?php echo htmlspecialchars($product['HinhAnh']); ?>" 
+                            <?php 
+                            $imageSrc = (preg_match('/^https?:\\/\\//', $product['HinhAnh'])) 
+                                ? $product['HinhAnh'] 
+                                : '../public/uploads/products/' . $product['HinhAnh'];
+                            ?>
+                            <img src="<?php echo htmlspecialchars($imageSrc); ?>" 
                                  alt="<?php echo htmlspecialchars($product['TenSP']); ?>"
-                                 style="width: 50px; height: 50px; object-fit: cover; border-radius: 5px; border: 1px solid #ddd;">
+                                 class="product-img">
                         <?php else: ?>
-                            <div style="width: 50px; height: 50px; background: #f0f0f0; border-radius: 5px; display: flex; align-items: center; justify-content: center;">
-                                <i class="fas fa-image" style="color: #ccc; font-size: 20px;"></i>
+                            <div class="product-img-placeholder">
+                                <i class="fas fa-image"></i>
                             </div>
                         <?php endif; ?>
                     </td>
                     <td>
-                        <strong><?php echo htmlspecialchars($product['TenSP']); ?></strong>
+                        <strong class="product-name" title="<?php echo htmlspecialchars($product['TenSP']); ?>">
+                            <?php echo htmlspecialchars($product['TenSP']); ?>
+                        </strong>
                     </td>
                     <td><?php echo htmlspecialchars($product['TenDM']); ?></td>
                     <td><?php echo htmlspecialchars($product['TenTH']); ?></td>
@@ -53,7 +60,7 @@
                             </span>
                         <?php endif; ?>
                     </td>
-                    <td>
+                    <td class="text-center">
                         <?php if ($product['TongTonKho'] < 10): ?>
                             <span class="badge badge-warning"><?php echo $product['TongTonKho']; ?></span>
                         <?php else: ?>
@@ -61,12 +68,6 @@
                         <?php endif; ?>
                     </td>
                     <td class="actions">
-                        <a href="../public/index.php?controller=product&action=detail&id=<?php echo $product['MaSP']; ?>" 
-                           class="btn btn-sm btn-info" 
-                           title="Xem"
-                           target="_blank">
-                            <i class="fas fa-eye"></i>
-                        </a>
                         <a href="index.php?action=editProduct&id=<?php echo $product['MaSP']; ?>" 
                            class="btn btn-sm btn-primary" 
                            title="Sửa">

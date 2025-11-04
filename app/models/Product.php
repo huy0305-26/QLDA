@@ -12,9 +12,11 @@ class Product extends Model {
     /**
      * Lấy tất cả sản phẩm với thông tin đầy đủ (cho người dùng - chỉ sản phẩm còn hàng)
      * @param int $categoryId Lọc theo danh mục (0 = tất cả)
+     * @param int $limit Giới hạn số sản phẩm (0 = tất cả)
+     * @param int $offset Vị trí bắt đầu
      * @return array
      */
-    public function getAllProducts($categoryId = 0) {
+    public function getAllProducts($categoryId = 0, $limit = 0, $offset = 0) {
         $sql = "SELECT sp.MaSP, sp.TenSP, sp.MoTa, sp.HinhAnh, dm.TenDM, th.TenTH, sp.XuatXu,
                 MIN(bt.GiaBan) as GiaThapNhat, 
                 MAX(bt.GiaBan) as GiaCaoNhat,
@@ -37,12 +39,44 @@ class Product extends Model {
                  HAVING TongTonKho > 0
                  ORDER BY sp.MaSP DESC";
         
+        if ($limit > 0) {
+            $sql .= " LIMIT " . intval($limit) . " OFFSET " . intval($offset);
+        }
+        
         $result = $this->query($sql);
         
         if ($result) {
             return $result->fetch_all(MYSQLI_ASSOC);
         }
         return [];
+    }
+    
+    /**
+     * Đếm tổng số sản phẩm theo danh mục
+     * @param int $categoryId Lọc theo danh mục (0 = tất cả)
+     * @return int
+     */
+    public function countProducts($categoryId = 0) {
+        $sql = "SELECT COUNT(DISTINCT sp.MaSP) as total
+                FROM sanpham sp
+                LEFT JOIN danhmuc dm ON sp.MaDM = dm.MaDM
+                LEFT JOIN sanpham_bienthe bt ON sp.MaSP = bt.MaSP
+                WHERE EXISTS (
+                    SELECT 1 FROM sanpham_bienthe bt2 
+                    WHERE bt2.MaSP = sp.MaSP AND bt2.TonKho > 0
+                )";
+        
+        if ($categoryId > 0) {
+            $sql .= " AND (sp.MaDM = " . intval($categoryId) . " OR dm.MaDM_Cha = " . intval($categoryId) . ")";
+        }
+        
+        $result = $this->query($sql);
+        
+        if ($result) {
+            $row = $result->fetch_assoc();
+            return intval($row['total']);
+        }
+        return 0;
     }
     
     /**
@@ -158,17 +192,23 @@ class Product extends Model {
     public function search($keyword) {
         $keyword = $this->escape($keyword);
         
-        $sql = "SELECT sp.MaSP, sp.TenSP, sp.MoTa, dm.TenDM, th.TenTH,
-                MIN(bt.GiaBan) as GiaThapNhat
+        $sql = "SELECT sp.MaSP, sp.TenSP, sp.MoTa, sp.HinhAnh, dm.TenDM, th.TenTH,
+                MIN(bt.GiaBan) as GiaThapNhat,
+                MAX(bt.GiaBan) as GiaCaoNhat,
+                MIN(bt.GiaGoc) as GiaGocThapNhat,
+                MAX(bt.GiaGoc) as GiaGocCaoNhat,
+                SUM(bt.TonKho) as TongTonKho
                 FROM sanpham sp
                 LEFT JOIN danhmuc dm ON sp.MaDM = dm.MaDM
                 LEFT JOIN thuonghieu th ON sp.MaTH = th.MaTH
                 LEFT JOIN sanpham_bienthe bt ON sp.MaSP = bt.MaSP
-                WHERE sp.TenSP LIKE '%{$keyword}%' 
+                WHERE (sp.TenSP LIKE '%{$keyword}%'
                 OR sp.MoTa LIKE '%{$keyword}%'
                 OR dm.TenDM LIKE '%{$keyword}%'
-                OR th.TenTH LIKE '%{$keyword}%'
-                GROUP BY sp.MaSP";
+                OR th.TenTH LIKE '%{$keyword}%')
+                GROUP BY sp.MaSP
+                HAVING TongTonKho > 0
+                ORDER BY sp.MaSP DESC";
         
         $result = $this->query($sql);
         
