@@ -185,14 +185,92 @@ class Product extends Model {
     }
     
     /**
-     * Tìm kiếm sản phẩm
+     * Lấy danh sách thương hiệu dựa trên từ khóa tìm kiếm
      * @param string $keyword
      * @return array
      */
-    public function search($keyword) {
+    public function getBrandsByKeyword($keyword) {
         $keyword = $this->escape($keyword);
+        $sql = "SELECT DISTINCT th.* 
+                FROM thuonghieu th
+                JOIN sanpham sp ON th.MaTH = sp.MaTH
+                WHERE sp.TenSP LIKE '%{$keyword}%' 
+                OR sp.MoTa LIKE '%{$keyword}%'
+                OR th.TenTH LIKE '%{$keyword}%'
+                ORDER BY th.TenTH";
         
-        $sql = "SELECT sp.MaSP, sp.TenSP, sp.MoTa, sp.HinhAnh, dm.TenDM, th.TenTH,
+        $result = $this->query($sql);
+        if ($result) {
+            return $result->fetch_all(MYSQLI_ASSOC);
+        }
+        return [];
+    }
+
+    /**
+     * Lấy danh sách danh mục dựa trên từ khóa tìm kiếm
+     * @param string $keyword
+     * @return array
+     */
+    public function getCategoriesByKeyword($keyword) {
+        $keyword = $this->escape($keyword);
+        $sql = "SELECT DISTINCT dm.* 
+                FROM danhmuc dm
+                JOIN sanpham sp ON dm.MaDM = sp.MaDM
+                WHERE sp.TenSP LIKE '%{$keyword}%' 
+                OR sp.MoTa LIKE '%{$keyword}%'
+                OR dm.TenDM LIKE '%{$keyword}%'
+                ORDER BY dm.TenDM";
+        
+        $result = $this->query($sql);
+        if ($result) {
+            return $result->fetch_all(MYSQLI_ASSOC);
+        }
+        return [];
+    }
+
+    /**
+     * Lấy danh sách xuất xứ dựa trên từ khóa tìm kiếm
+     * @param string $keyword
+     * @return array
+     */
+    public function getOriginsByKeyword($keyword) {
+        $keyword = $this->escape($keyword);
+        $sql = "SELECT DISTINCT sp.XuatXu 
+                FROM sanpham sp
+                WHERE (sp.TenSP LIKE '%{$keyword}%' 
+                OR sp.MoTa LIKE '%{$keyword}%')
+                AND sp.XuatXu IS NOT NULL 
+                AND sp.XuatXu != ''
+                ORDER BY sp.XuatXu";
+        
+        $result = $this->query($sql);
+        if ($result) {
+            $data = [];
+            while ($row = $result->fetch_assoc()) {
+                $data[] = $row['XuatXu'];
+            }
+            return $data;
+        }
+        return [];
+    }
+
+    /**
+     * Tìm kiếm sản phẩm
+     * @param string $keyword
+     * @param int $brandId
+     * @param int $categoryId
+     * @param int $minPrice
+     * @param int $maxPrice
+     * @param string $origin
+     * @param int $limit
+     * @param int $offset
+     * @return array
+     */
+    public function search($keyword, $brandId = 0, $categoryId = 0, $minPrice = 0, $maxPrice = 0, $origin = '', $limit = 0, $offset = 0) {
+        $keyword = $this->escape($keyword);
+        $origin = $this->escape($origin);
+        
+        $sql = "SELECT sp.MaSP, sp.TenSP, sp.MoTa, sp.HinhAnh, dm.TenDM, th.TenTH, sp.XuatXu,
                 MIN(bt.GiaBan) as GiaThapNhat,
                 MAX(bt.GiaBan) as GiaCaoNhat,
                 MIN(bt.GiaGoc) as GiaGocThapNhat,
@@ -205,10 +283,36 @@ class Product extends Model {
                 WHERE (sp.TenSP LIKE '%{$keyword}%'
                 OR sp.MoTa LIKE '%{$keyword}%'
                 OR dm.TenDM LIKE '%{$keyword}%'
-                OR th.TenTH LIKE '%{$keyword}%')
-                GROUP BY sp.MaSP
-                HAVING TongTonKho > 0
-                ORDER BY sp.MaSP DESC";
+                OR th.TenTH LIKE '%{$keyword}%')";
+        
+        if ($brandId > 0) {
+            $sql .= " AND sp.MaTH = " . intval($brandId);
+        }
+        
+        if ($categoryId > 0) {
+            $sql .= " AND (sp.MaDM = " . intval($categoryId) . " OR dm.MaDM_Cha = " . intval($categoryId) . ")";
+        }
+
+        if (!empty($origin)) {
+            $sql .= " AND sp.XuatXu = '{$origin}'";
+        }
+        
+        $sql .= " GROUP BY sp.MaSP
+                 HAVING TongTonKho > 0";
+
+        if ($minPrice > 0) {
+            $sql .= " AND GiaThapNhat >= " . intval($minPrice);
+        }
+
+        if ($maxPrice > 0) {
+            $sql .= " AND GiaThapNhat <= " . intval($maxPrice);
+        }
+                 
+        $sql .= " ORDER BY sp.MaSP DESC";
+
+        if ($limit > 0) {
+            $sql .= " LIMIT " . intval($limit) . " OFFSET " . intval($offset);
+        }
         
         $result = $this->query($sql);
         
@@ -216,6 +320,68 @@ class Product extends Model {
             return $result->fetch_all(MYSQLI_ASSOC);
         }
         return [];
+    }
+
+    /**
+     * Đếm số lượng kết quả tìm kiếm (để phân trang)
+     * @param string $keyword
+     * @param int $brandId
+     * @param int $categoryId
+     * @param int $minPrice
+     * @param int $maxPrice
+     * @param string $origin
+     * @return int
+     */
+    public function countSearch($keyword, $brandId = 0, $categoryId = 0, $minPrice = 0, $maxPrice = 0, $origin = '') {
+        $keyword = $this->escape($keyword);
+        $origin = $this->escape($origin);
+        
+        // Sử dụng subquery để đếm số lượng group
+        $sql = "SELECT COUNT(*) as total FROM (
+                SELECT sp.MaSP,
+                MIN(bt.GiaBan) as GiaThapNhat,
+                SUM(bt.TonKho) as TongTonKho
+                FROM sanpham sp
+                LEFT JOIN danhmuc dm ON sp.MaDM = dm.MaDM
+                LEFT JOIN thuonghieu th ON sp.MaTH = th.MaTH
+                LEFT JOIN sanpham_bienthe bt ON sp.MaSP = bt.MaSP
+                WHERE (sp.TenSP LIKE '%{$keyword}%'
+                OR sp.MoTa LIKE '%{$keyword}%'
+                OR dm.TenDM LIKE '%{$keyword}%'
+                OR th.TenTH LIKE '%{$keyword}%')";
+        
+        if ($brandId > 0) {
+            $sql .= " AND sp.MaTH = " . intval($brandId);
+        }
+        
+        if ($categoryId > 0) {
+            $sql .= " AND (sp.MaDM = " . intval($categoryId) . " OR dm.MaDM_Cha = " . intval($categoryId) . ")";
+        }
+
+        if (!empty($origin)) {
+            $sql .= " AND sp.XuatXu = '{$origin}'";
+        }
+        
+        $sql .= " GROUP BY sp.MaSP
+                 HAVING TongTonKho > 0";
+
+        if ($minPrice > 0) {
+            $sql .= " AND GiaThapNhat >= " . intval($minPrice);
+        }
+
+        if ($maxPrice > 0) {
+            $sql .= " AND GiaThapNhat <= " . intval($maxPrice);
+        }
+                 
+        $sql .= ") as subquery";
+        
+        $result = $this->query($sql);
+        
+        if ($result) {
+            $row = $result->fetch_assoc();
+            return intval($row['total']);
+        }
+        return 0;
     }
 }
 ?>

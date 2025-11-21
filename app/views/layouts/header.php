@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo isset($page_title) ? $page_title . ' - ' : ''; ?>DTH Store</title>
     <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
@@ -32,17 +33,17 @@
                         <?php if (!empty($parent['children'])): ?>
                             <!-- Danh mục có con - hiển thị dropdown -->
                             <div class="nav-dropdown">
-                                <a href="index.php?category=<?php echo $parent['MaDM']; ?>" class="nav-link">
+                                <a href="index.php?controller=home&action=search&q=<?php echo urlencode($parent['TenDM']); ?>" class="nav-link">
                                     <?php echo htmlspecialchars($parent['TenDM']); ?>
                                     <i class="fas fa-chevron-down" style="font-size: 0.7rem; margin-left: 3px;"></i>
                                 </a>
                                 <div class="dropdown-menu">
-                                    <a href="index.php?category=<?php echo $parent['MaDM']; ?>" class="dropdown-item">
+                                    <a href="index.php?controller=home&action=search&q=<?php echo urlencode($parent['TenDM']); ?>" class="dropdown-item">
                                         <i class="fas fa-th"></i> Tất cả <?php echo htmlspecialchars($parent['TenDM']); ?>
                                     </a>
                                     <div class="dropdown-divider"></div>
                                     <?php foreach ($parent['children'] as $child): ?>
-                                    <a href="index.php?category=<?php echo $child['MaDM']; ?>" class="dropdown-item">
+                                    <a href="index.php?controller=home&action=search&q=<?php echo urlencode($child['TenDM']); ?>" class="dropdown-item">
                                         <?php echo htmlspecialchars($child['TenDM']); ?>
                                     </a>
                                     <?php endforeach; ?>
@@ -50,7 +51,7 @@
                             </div>
                         <?php else: ?>
                             <!-- Danh mục không có con - link thường -->
-                            <a href="index.php?category=<?php echo $parent['MaDM']; ?>" class="nav-link">
+                            <a href="index.php?controller=home&action=search&q=<?php echo urlencode($parent['TenDM']); ?>" class="nav-link">
                                 <?php echo htmlspecialchars($parent['TenDM']); ?>
                             </a>
                         <?php endif; ?>

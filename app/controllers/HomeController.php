@@ -18,32 +18,34 @@ class HomeController extends Controller {
         // Lấy danh mục filter nếu có
         $categoryId = isset($_GET['category']) ? intval($_GET['category']) : 0;
         
+        // Nếu có category ID, chuyển hướng sang trang tìm kiếm
+        if ($categoryId > 0) {
+            $category = $categoryModel->getCategoryById($categoryId);
+            if ($category) {
+                $this->redirect('index.php?controller=home&action=search&q=' . urlencode($category['TenDM']));
+                return;
+            }
+        }
+        
         // Nếu đang ở trang chủ (không có category): chỉ lấy 4 sản phẩm
-        // Nếu đang lọc theo danh mục: lấy tất cả sản phẩm
-        $limit = ($categoryId > 0) ? 0 : 4;
-        $products = $productModel->getAllProducts($categoryId, $limit, 0);
-        $totalProducts = $productModel->countProducts($categoryId);
+        $limit = 4;
+        $products = $productModel->getAllProducts(0, $limit, 0);
+        $totalProducts = $productModel->countProducts(0);
         
         $categories = $categoryModel->getAllCategories();
         $categoriesTree = $categoryModel->getCategoriesTree();
         
-        // Lấy tên danh mục nếu đang filter
-        $currentCategory = null;
-        if ($categoryId > 0) {
-            $currentCategory = $categoryModel->getCategoryById($categoryId);
-        }
-        
         // Truyền dữ liệu vào view
         $data = [
-            'page_title' => $categoryId > 0 && $currentCategory ? $currentCategory['TenDM'] : 'Trang chủ',
+            'page_title' => 'Trang chủ',
             'products' => $products,
             'categories' => $categories,
             'categoriesTree' => $categoriesTree,
-            'currentCategory' => $currentCategory,
-            'categoryId' => $categoryId,
+            'currentCategory' => null,
+            'categoryId' => 0,
             'totalProducts' => $totalProducts,
             'currentCount' => count($products),
-            'showLoadMore' => ($categoryId == 0) // Chỉ hiển thị nút "Xem thêm" ở trang chủ
+            'showLoadMore' => true
         ];
         
         $this->view('home/index', $data);
@@ -81,22 +83,48 @@ class HomeController extends Controller {
     public function search() {
         $productModel = $this->model('Product');
         $categoryModel = $this->model('Category');
+        $brandModel = $this->model('Brand');
         
         $keyword = isset($_GET['q']) ? trim($_GET['q']) : '';
+        $brandId = isset($_GET['brand']) ? intval($_GET['brand']) : 0;
+        $categoryId = isset($_GET['category']) ? intval($_GET['category']) : 0;
+        $minPrice = isset($_GET['min_price']) ? intval($_GET['min_price']) : 0;
+        $maxPrice = isset($_GET['max_price']) ? intval($_GET['max_price']) : 0;
+        $origin = isset($_GET['origin']) ? trim($_GET['origin']) : '';
+        $page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
+        $limit = 9; // 9 sản phẩm mỗi trang
+        $offset = ($page - 1) * $limit;
         
         if (empty($keyword)) {
             $this->redirect('index.php');
             return;
         }
         
-        $products = $productModel->search($keyword);
-        $categories = $categoryModel->getAllCategories();
+        // Tìm kiếm sản phẩm với các bộ lọc và phân trang
+        $products = $productModel->search($keyword, $brandId, $categoryId, $minPrice, $maxPrice, $origin, $limit, $offset);
+        $totalRecords = $productModel->countSearch($keyword, $brandId, $categoryId, $minPrice, $maxPrice, $origin);
+        $totalPages = ceil($totalRecords / $limit);
+        
+        // Lấy danh mục và thương hiệu dựa trên từ khóa tìm kiếm (Context-Aware)
+        $categories = $productModel->getCategoriesByKeyword($keyword);
+        $brands = $productModel->getBrandsByKeyword($keyword);
+        $origins = $productModel->getOriginsByKeyword($keyword);
         
         $data = [
             'page_title' => 'Kết quả tìm kiếm: ' . $keyword,
             'products' => $products,
             'categories' => $categories,
-            'keyword' => $keyword
+            'brands' => $brands,
+            'origins' => $origins,
+            'keyword' => $keyword,
+            'brandId' => $brandId,
+            'categoryId' => $categoryId,
+            'minPrice' => $minPrice,
+            'maxPrice' => $maxPrice,
+            'origin' => $origin,
+            'page' => $page,
+            'totalPages' => $totalPages,
+            'totalRecords' => $totalRecords
         ];
         
         $this->view('home/search', $data);
