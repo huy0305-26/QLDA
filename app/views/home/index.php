@@ -18,6 +18,7 @@
         <div class="product-grid" id="product-grid">
             <?php foreach($products as $product): ?>
             <div class="product-card">
+                <a href="index.php?controller=product&action=detail&id=<?php echo $product['MaSP']; ?>" class="product-card-link">
                 <?php 
                 // Tính phần trăm giảm giá
                 $discountPercent = 0;
@@ -50,11 +51,9 @@
                             <i class="fas fa-truck"></i> Freeship
                         </div>
                     </div>
-                </a>
+                
                 <div class="product-info">
-                    <a href="index.php?controller=product&action=detail&id=<?php echo $product['MaSP']; ?>" class="product-title-link">
-                        <h3><?php echo htmlspecialchars($product['TenSP']); ?></h3>
-                    </a>
+                    <h3 class="product-title"><?php echo htmlspecialchars($product['TenSP']); ?></h3>
                     <p class="product-brand"><?php echo htmlspecialchars($product['TenTH']); ?></p>
                     
                     <div class="product-price-box">
@@ -71,6 +70,7 @@
                         <?php endif; ?>
                     </div>
                 </div>
+                </a>
             </div>
             <?php endforeach; ?>
         </div>
@@ -220,20 +220,18 @@ document.addEventListener('DOMContentLoaded', function() {
         
         return `
             <div class="product-card">
+                <a href="index.php?controller=product&action=detail&id=${product.MaSP}" class="product-card-link">
                 ${discountBadge}
-                <a href="index.php?controller=product&action=detail&id=${product.MaSP}" class="product-link">
-                    <div class="product-image">
-                        ${imageHtml}
-                        ${freeshipBadge}
-                    </div>
-                </a>
+                <div class="product-image">
+                    ${imageHtml}
+                    ${freeshipBadge}
+                </div>
                 <div class="product-info">
-                    <a href="index.php?controller=product&action=detail&id=${product.MaSP}" class="product-title-link">
-                        <h3>${escapeHtml(product.TenSP)}</h3>
-                    </a>
+                    <h3 class="product-title">${escapeHtml(product.TenSP)}</h3>
                     <p class="product-brand">${escapeHtml(product.TenTH)}</p>
                     <div class="product-price-box">${priceHtml}</div>
                 </div>
+                </a>
             </div>
         `;
     }
