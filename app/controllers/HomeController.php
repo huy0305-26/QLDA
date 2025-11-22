@@ -28,12 +28,24 @@ class HomeController extends Controller {
         }
         
         // Nếu đang ở trang chủ (không có category): chỉ lấy 4 sản phẩm
-        $limit = 4;
+        $limit = 8;
         $products = $productModel->getAllProducts(0, $limit, 0);
         $totalProducts = $productModel->countProducts(0);
         
         $categories = $categoryModel->getAllCategories();
         $categoriesTree = $categoryModel->getCategoriesTree();
+
+        // Get collection images
+        $collectionDir = __DIR__ . '/../../public/uploads/collection';
+        $collectionImages = [];
+        if (is_dir($collectionDir)) {
+            $files = scandir($collectionDir);
+            foreach ($files as $file) {
+                if ($file !== '.' && $file !== '..') {
+                    $collectionImages[] = $file;
+                }
+            }
+        }
         
         // Truyền dữ liệu vào view
         $data = [
@@ -41,6 +53,7 @@ class HomeController extends Controller {
             'products' => $products,
             'categories' => $categories,
             'categoriesTree' => $categoriesTree,
+            'collectionImages' => $collectionImages,
             'currentCategory' => null,
             'categoryId' => 0,
             'totalProducts' => $totalProducts,

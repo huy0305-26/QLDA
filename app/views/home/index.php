@@ -1,11 +1,10 @@
 <?php require_once __DIR__ . '/../layouts/header.php'; ?>
 
+<div class="hero-full-width">
+    <img src="uploads/home/HOMEPAGE_BLACK_FRIDAY_141125_PC.webp" alt="Black Friday Sale">
+</div>
+
 <div class="container">
-    <section class="hero">
-        <div class="hero-content">
-            <h1>Thời trang xịn - Giá hợp lý</h1>
-        </div>
-    </section>
 
     <?php if ($currentCategory): ?>
     <div class="breadcrumb">
@@ -14,8 +13,7 @@
     <?php endif; ?>
 
     <section class="products">
-        <h2>Sản phẩm <?php echo $currentCategory ? '- ' . htmlspecialchars($currentCategory['TenDM']) : 'mới nhất'; ?></h2>
-        
+        <h2 class="section-title">Sản phẩm mới</h2>        
         <?php if (!empty($products)): ?>
         <div class="product-grid" id="product-grid">
             <?php foreach($products as $product): ?>
@@ -32,7 +30,6 @@
                 <div class="product-badge">-<?php echo $discountPercent; ?>%</div>
                 <?php endif; ?>
                 
-                <a href="index.php?controller=product&action=detail&id=<?php echo $product['MaSP']; ?>" class="product-link">
                     <div class="product-image">
                         <?php if (!empty($product['HinhAnh'])): ?>
                             <?php 
@@ -48,6 +45,10 @@
                                 <p>Chưa có ảnh</p>
                             </div>
                         <?php endif; ?>
+                        
+                        <div class="freeship-badge">
+                            <i class="fas fa-truck"></i> Freeship
+                        </div>
                     </div>
                 </a>
                 <div class="product-info">
@@ -92,6 +93,36 @@
         </div>
         <?php endif; ?>
     </section>
+
+</div>
+
+<!-- Scrolling Banner -->
+<div class="scrolling-banner">
+    <div class="scrolling-content">
+        <?php for($i = 0; $i < 10; $i++): ?>
+        <span class="scrolling-item">MIỄN PHÍ SHIP</span>
+        <?php endfor; ?>
+        <!-- Duplicate for seamless loop -->
+        <?php for($i = 0; $i < 10; $i++): ?>
+        <span class="scrolling-item">MIỄN PHÍ SHIP</span>
+        <?php endfor; ?>
+    </div>
+</div>
+
+<div class="container">
+
+    <?php if (!empty($collectionImages)): ?>
+    <section class="collection-section">
+        <h2 class="section-title">Trạm phong cách</h2>
+        <div class="collection-grid">
+            <?php foreach($collectionImages as $image): ?>
+            <div class="collection-item">
+                <img src="uploads/collection/<?php echo htmlspecialchars($image); ?>" alt="Collection Image">
+            </div>
+            <?php endforeach; ?>
+        </div>
+    </section>
+    <?php endif; ?>
 </div>
 
 <script>
@@ -159,6 +190,12 @@ document.addEventListener('DOMContentLoaded', function() {
             discountBadge = `<div class="product-badge">-${discountPercent}%</div>`;
         }
         
+        const freeshipBadge = `
+            <div class="freeship-badge">
+                <i class="fas fa-truck"></i> Freeship
+            </div>
+        `;
+        
         let imageHtml = '';
         if (product.HinhAnh) {
             const isUrl = /^https?:\/\//i.test(product.HinhAnh);
@@ -185,7 +222,10 @@ document.addEventListener('DOMContentLoaded', function() {
             <div class="product-card">
                 ${discountBadge}
                 <a href="index.php?controller=product&action=detail&id=${product.MaSP}" class="product-link">
-                    <div class="product-image">${imageHtml}</div>
+                    <div class="product-image">
+                        ${imageHtml}
+                        ${freeshipBadge}
+                    </div>
                 </a>
                 <div class="product-info">
                     <a href="index.php?controller=product&action=detail&id=${product.MaSP}" class="product-title-link">

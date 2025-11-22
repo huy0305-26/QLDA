@@ -147,6 +147,10 @@
                                     <p>Chưa có ảnh</p>
                                 </div>
                             <?php endif; ?>
+                            
+                            <div class="freeship-badge">
+                                <i class="fas fa-truck"></i> Freeship
+                            </div>
                         </div>
                     </a>
                     <div class="product-info">
